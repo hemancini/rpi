@@ -25,5 +25,9 @@ ssh pi@pi.local 'sudo bash ~/scripts/install-locales.sh'
 # Crear alias en el dispositivo Pi
 ssh pi@pi.local 'bash ~/scripts/crear-alias.sh'
 
+# Instalar php
+echo "Instalando PHP en el dispositivo Pi..."
+ssh pi@pi.local 'cd ~/php && sudo bash setup.sh'
+
 # Instalar oh-my-zsh en el dispositivo Pi
 # ssh pi@pi.local 'sudo bash ~/scripts/install-oh-my-zsh.sh'

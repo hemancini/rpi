@@ -5,9 +5,10 @@
 source "$(dirname "${BASH_SOURCE[0]}")/../scripts/logging.sh" 2>/dev/null ||
     source "$(dirname "${BASH_SOURCE[0]}")/scripts/logging.sh"
 
-# Asegurarse de que el script se ejecuta como root
-if [[ $EUID -ne 0 ]]; then
-    log_error "Este script debe ejecutarse como root"
+# Asegurarse de que el script se ejecuta como root (excepto check-network.sh)
+calling_script=$(basename "${BASH_SOURCE[1]}")
+if [[ $EUID -ne 0 && "$calling_script" != "check-network.sh" ]]; then
+    log_error "[!] Este script debe ejecutarse como root"
     exit 1
 fi
 
@@ -133,6 +134,7 @@ save_iptables_persistent() {
 
 # Instalar paquetes requeridos
 install_packages() {
+    DEBIAN_FRONTEND=noninteractive # Evitar preguntas interactivas durante la instalación
     local RPI_PKGS="${1:-$RPI_PKGS_NAT}"
     local UPGRADE=false
     echo "[x] Verificando paquetes requeridos..."

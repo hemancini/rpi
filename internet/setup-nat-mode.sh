@@ -3,7 +3,6 @@
 # Script para compartir internet desde eth0 a wlan0 en modo NAT
 # Crea un punto de acceso WiFi llamado "pi-nat" con contraseña "12345678"
 # Bloquea dominios google.com y facebook.com
-# Incluye la creación de un servicio para desbloquear rfkill y reiniciar servicios de red.
 
 # Funciones comunes
 source "$(dirname "${BASH_SOURCE[0]}")/common-functions.sh"
@@ -21,9 +20,9 @@ DHCP_RANGE_END="192.168.4.20"
 
 USER_HOME=$(eval echo ~${SUDO_USER:-$USER})
 
-# Instalar paquetes necesarios
-echo "[x] Instalando paquetes requeridos para modo Bridge..."
-install_packages "hostapd bridge-utils iptables rfkill netfilter-persistent iw net-tools"
+echo "[x] Instalando paquetes requeridos para modo NAT..."
+install_packages "hostapd dnsmasq dhcpcd5 dnsutils iptables rfkill netfilter-persistent"
+# sudo apt -y purge hostapd dnsmasq dhcpcd5 dnsutils iptables rfkill netfilter-persistent
 
 echo "[x] Revirtiendo configuración configuración previa de internet compartido..."
 bash "$(dirname "${BASH_SOURCE[0]}")/revert-internet-share.sh"
@@ -214,7 +213,7 @@ echo "[x] Reiniciando hostapd..."
 sudo systemctl restart hostapd || true
 
 echo "[x] Configurando NAT y forwarding de iptables..."
-sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+sudo iptables -t nat -A POSTROUTING -o $ETHERNET_IF -j MASQUERADE
 
 exit 0
 EOF

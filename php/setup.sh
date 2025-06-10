@@ -31,23 +31,6 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-# # Update system packages
-# print_message "Updating system packages..."
-# apt update || {
-#     print_warning "Failed to update package lists. Continuing anyway..."
-# }
-
-# apt upgrade -y || {
-#     print_warning "Failed to upgrade packages. Continuing anyway..."
-# }
-
-# # Install required packages
-# print_message "Installing necessary packages..."
-# apt install -y php-cli php-fpm nginx sudo git || {
-#     print_error "Failed to install packages. Please check your internet connection and try again."
-#     exit 1
-# }
-
 install_packages "php-cli php-fpm nginx sudo git"
 
 # Create directory structure
@@ -201,3 +184,47 @@ print_message "Web server running as user: $WEB_USER"
 # Show current PHP version
 PHP_VERSION=$(php -v | head -n 1)
 print_message "PHP version: $PHP_VERSION"
+
+# Current date and time
+CURRENT_DATE=$(date '+%Y-%m-%d %H:%M:%S')
+CURRENT_USER=$(whoami)
+
+echo -e "\n${GREEN}# Troubleshooting Guide for HTTP 500 Errors${NC}"
+echo -e "Current Date and Time (UTC): ${BLUE}${CURRENT_DATE}${NC}"
+echo -e "Current User's Login: ${BLUE}${CURRENT_USER}${NC}"
+echo ""
+
+echo -e "${YELLOW}## Troubleshooting Steps${NC}"
+echo ""
+
+echo -e "${GREEN}### 1. Check Nginx Error Logs${NC}"
+echo -e "${BLUE}sudo tail -n 50 /var/log/nginx/error.log${NC}"
+echo ""
+
+echo -e "${GREEN}### 2. Check PHP-FPM Error Logs${NC}"
+echo -e "${BLUE}sudo tail -n 50 /var/log/php*-fpm.log${NC}"
+echo -e "${BLUE}sudo journalctl -u php*-fpm --no-pager${NC}"
+echo ""
+
+echo -e "${GREEN}### 3. Check PHP-FPM Socket Existence and Permissions${NC}"
+echo -e "${BLUE}ls -la /var/run/php/${NC}"
+echo ""
+
+echo -e "${GREEN}### 4. Validate Nginx Configuration${NC}"
+echo -e "${BLUE}sudo nginx -t${NC}"
+echo ""
+
+echo -e "${YELLOW}## Common Issues${NC}"
+echo -e "- Incorrect PHP-FPM socket path in Nginx configuration"
+echo -e "- File permission issues in web directory"
+echo -e "- PHP code errors"
+echo -e "- Missing PHP extensions"
+echo -e "- SELinux/AppArmor blocking access"
+echo ""
+
+echo -e "${YELLOW}## Resolution Steps${NC}"
+echo -e "1. Update the PHP-FPM socket path in Nginx configuration"
+echo -e "2. Check and fix file permissions"
+echo -e "3. Restart services after making changes:"
+echo -e "${BLUE}sudo systemctl restart nginx${NC}"
+echo -e "${BLUE}sudo systemctl restart php*-fpm${NC}"

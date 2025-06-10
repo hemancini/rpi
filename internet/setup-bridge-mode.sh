@@ -13,9 +13,9 @@ detect_interfaces # Esta función debe definir ETHERNET_IF y WIFI_IF
 WIFI_SSID_BRIDGE="${WIFI_SSID_BRIDGE:-"pi-bridge"}"
 WIFI_PASS_BRIDGE="${WIFI_PASS_BRIDGE:-"12345678"}"
 
-# Instalar paquetes necesarios
 echo "[x] Instalando paquetes requeridos para modo Bridge..."
-install_packages "hostapd bridge-utils iptables rfkill netfilter-persistent iw net-tools"
+install_packages "hostapd bridge-utils iptables rfkill netfilter-persistent"
+# sudo apt -y purge hostapd bridge-utils iptables rfkill netfilter-persistent
 
 # Cargar módulos necesarios para bridge
 echo "[x] Cargando módulos del kernel necesarios para bridge..."

@@ -36,19 +36,22 @@ function readConfigVariable($file_path, $variable_name)
 {
   // Verificar si el archivo existe
   if (!file_exists($file_path)) {
-    throw new Exception("El archivo $file_path no existe");
+    // throw new Exception("El archivo $file_path no existe");
+    return ""; // Retorna null si el archivo no existe
   }
 
   // Verificar si el archivo es legible
   if (!is_readable($file_path)) {
-    throw new Exception("No se puede leer el archivo $file_path");
+    // throw new Exception("No se puede leer el archivo $file_path");
+    return "";
   }
 
   // Leer el contenido del archivo
   $content = file_get_contents($file_path);
 
   if ($content === false) {
-    throw new Exception("Error al leer el archivo $file_path");
+    // throw new Exception("Error al leer el archivo $file_path");
+    return "";
   }
 
   // Buscar la variable usando expresión regular

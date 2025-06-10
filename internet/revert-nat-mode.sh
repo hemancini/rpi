@@ -3,6 +3,10 @@
 # Script para revertir los cambios del script de NAT/hotspot WiFi
 # Revierte configuraciones de red, iptables, servicios y archivos de configuración
 
+echo "================================================"
+echo "INICIANDO REVERSIÓN DE CONFIGURACIÓN NAT/HOTSPOT"
+echo "================================================"
+
 # Funciones comunes
 source "$(dirname "${BASH_SOURCE[0]}")/common-functions.sh"
 detect_interfaces # Esta función debe definir ETHERNET_IF y WIFI_IF
@@ -12,18 +16,16 @@ WIFI_IF="${WIFI_IF:-wlan0}"
 ETHERNET_IF="${ETHERNET_IF:-eth0}"
 STATIC_WIFI_IP="192.168.4.1/24"
 
-echo "================================================"
-echo "INICIANDO REVERSIÓN DE CONFIGURACIÓN NAT/HOTSPOT"
-echo "================================================"
-
 echo "[x] Deteniendo servicios relacionados..."
 systemctl stop hostapd 2>/dev/null || true
 systemctl stop dnsmasq 2>/dev/null || true
+# systemctl stop dhcpcd 2>/dev/null || true
 systemctl stop init-service 2>/dev/null || true
 
 echo "[x] Deshabilitando servicios..."
 systemctl disable hostapd 2>/dev/null || true
 systemctl disable dnsmasq 2>/dev/null || true
+# systemctl disable dhcpcd 2>/dev/null || true
 systemctl disable init-service 2>/dev/null || true
 
 echo "[x] Eliminando servicio init-service..."
@@ -94,8 +96,8 @@ echo "[x] Limpiando configuración de red de la interfaz WiFi..."
 # Eliminar IP estática de la interfaz WiFi
 ip addr flush dev $WIFI_IF 2>/dev/null || true
 
-echo "[ ] Reiniciando servicios de red..."
-# systemctl restart dhcpcd || true
+echo "[⏳] Reiniciando servicios de red (dhcpcd)..."
+systemctl restart dhcpcd || true
 
 # Intentar restaurar wpa_supplicant si estaba configurado
 if [ -f /etc/wpa_supplicant/wpa_supplicant.conf ]; then
@@ -118,10 +120,13 @@ fi
 echo "[x] Verificando reglas de iptables..."
 IPTABLES_RULES=$(iptables -L -n | wc -l)
 if [ "$IPTABLES_RULES" -le 10 ]; then
-  echo "[i] Reglas de iptables limpiadas correctamente."
+  echo "[x] Reglas de iptables limpiadas correctamente."
 else
   echo "[!] Advertencia: Aún existen reglas de iptables. Ejecuta 'iptables -L' para verificar."
 fi
+
+# Eliminar valor RPI_NETWORK_MODE
+sed -i '/^RPI_NETWORK_MODE=/d' /etc/global_var.conf
 
 echo ""
 echo "--------------------------------------------------------------------"

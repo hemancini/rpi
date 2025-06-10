@@ -1,6 +1,16 @@
 #!/bin/bash
 
-source /etc/global_var.conf
+# Este script verifica el estado de la red después de un reinicio
+# y muestra información relevante como interfaces, rutas, servicios y conectividad.
+
+# Funciones comunes
+source "$(dirname "${BASH_SOURCE[0]}")/common-functions.sh"
+
+# Instalar paquetes necesarios
+install_packages "iw net-tools"
+
+# Cargar variables globales
+source /etc/global_var.conf || true
 
 echo "=== Verificación de red post-reinicio ==="
 echo "Fecha: $(date)"

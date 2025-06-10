@@ -16,5 +16,4 @@ elif [[ "$RPI_NETWORK_MODE" == "nat" ]]; then
   source "$(dirname "${BASH_SOURCE[0]}")/revert-nat-mode.sh"
 else
   echo "[!] Modo de red desconocido: $RPI_NETWORK_MODE. No se realizará ninguna acción."
-  exit 1
 fi
