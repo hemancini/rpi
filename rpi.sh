@@ -15,9 +15,9 @@ fi
 
 # Si la copia de la clave fue exitosa, proceder con la copia de archivos
 echo -e "Clave pública copiada exitosamente.\nProcediendo con la copia de archivos..."
-scp -r /Users/hemancini/PI-Pwn/Raspberry\ Pi\ OS\ Lite\/internet/* pi@pi.local:/home/pi/
-scp -r /Users/hemancini/PI-Pwn/Raspberry\ Pi\ OS\ Lite\/scripts/* pi@pi.local:/home/pi/scripts/
-scp -r /Users/hemancini/PI-Pwn/Raspberry\ Pi\ OS\ Lite\/php/* pi@pi.local:/home/pi/php/
+scp -r ~/PI-Pwn/Raspberry\ Pi\ OS\ Lite\/internet/* pi@pi.local:/home/pi/
+scp -r ~/PI-Pwn/Raspberry\ Pi\ OS\ Lite\/scripts/* pi@pi.local:/home/pi/scripts/
+scp -r ~/PI-Pwn/Raspberry\ Pi\ OS\ Lite\/php/* pi@pi.local:/home/pi/php/
 
 # Ejecutar script de configuración en el dispositivo Pi
 ssh pi@pi.local 'sudo bash ~/scripts/install-locales.sh'
