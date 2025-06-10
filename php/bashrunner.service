@@ -1,0 +1,18 @@
+[Unit]
+Description=Bash Runner Web Application
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+ExecStart=/usr/bin/php -S 0.0.0.0:8080 -t /var/www/bashrunner
+WorkingDirectory=/var/www/bashrunner
+Restart=always
+RestartSec=5
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=bashrunner
+
+[Install]
+WantedBy=multi-user.target

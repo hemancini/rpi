@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PS4 9.00</title>
+    <style>
+      :root {
+        /* Light Mode Palette - PlayStation Inspired */
+        --body-bg: #f0f2f5;
+        --text-color: #333333;
+        --heading-color: #003087;
+        --button-bg: #006fcd;
+        --button-text: #ffffff;
+        --button-border: #006fcd;
+        --button-hover-bg: #005baa;
+        --button-hover-border: #005baa;
+        --button-active-bg: #004c8c;
+        --arrow-button-separator: #005baa;
+        --arrow-color: #ffffff;
+        --dropdown-bg: #ffffff;
+        --dropdown-border: #d9dee3;
+        --dropdown-text: #333333;
+        --dropdown-option-hover-bg: #e9eff5;
+        --dropdown-option-separator: #e9eff5;
+        --switch-bg: #bcc2c7;
+        --switch-slider-bg: #ffffff;
+        --switch-active-bg: #006fcd;
+        --switch-focus-ring: #006fcd;
+      }
+
+      body.dark-mode {
+        /* Dark Mode Palette - PlayStation Inspired */
+        --body-bg: #121212;
+        --text-color: #e0e0e0;
+        --heading-color: #ffffff;
+        --button-bg: #007fff;
+        --button-text: #ffffff;
+        --button-border: #007fff;
+        --button-hover-bg: #2e9bff;
+        --button-hover-border: #2e9bff;
+        --button-active-bg: #57abff;
+        --arrow-button-separator: #0066cc;
+        --arrow-color: #ffffff;
+        --dropdown-bg: #2a2d30;
+        --dropdown-border: #3c3f42;
+        --dropdown-text: #e0e0e0;
+        --dropdown-option-hover-bg: #3c3f42;
+        --dropdown-option-separator: #333639;
+        --switch-bg: #5f6368;
+        --switch-slider-bg: #e0e0e0;
+        --switch-active-bg: #007fff;
+        --switch-focus-ring: #007fff;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: var(--body-bg);
+        color: var(--text-color);
+        padding: 15px;
+        transition: background-color 0.3s, color 0.3s;
+        line-height: 1.6;
+        max-width: 1920px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      h2 {
+        color: var(--heading-color);
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 2em;
+      }
+
+      h3 {
+        color: var(--heading-color);
+        text-align: center;
+        margin-bottom: 15px;
+        font-size: 1.8em;
+      }
+
+      .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .theme-switch-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        margin-bottom: 20px;
+        padding-right: 10px;
+      }
+      .theme-switch-label {
+        margin-right: 10px;
+        font-size: 1em;
+        color: var(--text-color);
+      }
+
+      .theme-switch-button {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+        background-color: var(--switch-bg);
+        border-radius: 24px;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        vertical-align: middle;
+      }
+
+      .theme-switch-button:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--body-bg), 0 0 0 4px var(--switch-focus-ring);
+      }
+
+      .theme-switch-button::before {
+        content: "";
+        position: absolute;
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: var(--switch-slider-bg);
+        border-radius: 50%;
+        transition: transform 0.3s ease-in-out;
+      }
+
+      .theme-switch-button[aria-checked="true"] {
+        background-color: var(--switch-active-bg);
+      }
+
+      .theme-switch-button[aria-checked="true"]::before {
+        transform: translateX(26px);
+      }
+
+      .menu-container {
+        display: flex;
+        padding: 10px;
+        border-radius: 6px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .menu-container > .double-button-container {
+        margin-bottom: 12px;
+        margin-left: 6px;
+        margin-right: 6px;
+      }
+
+      .menu-button-base {
+        color: var(--button-text);
+        background-color: var(--button-bg);
+        border: 1px solid var(--button-border);
+        padding: 16px 28px;
+        text-align: center;
+        text-decoration: none;
+        font-size: 20px; /* MODIFIED: Increased font size */
+        font-weight: 500;
+        cursor: pointer;
+        border-radius: 5px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+        line-height: 1.3;
+      }
+
+      .menu-button-base:hover {
+        background-color: var(--button-hover-bg);
+        border-color: var(--button-hover-border);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+      body.dark-mode .menu-button-base:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      .menu-button-base:active {
+        background-color: var(--button-active-bg);
+        border-color: var(--button-active-border);
+        transform: scale(0.98);
+        box-shadow: none;
+      }
+
+      .double-button-container {
+        position: relative;
+        display: flex;
+        flex: 0 1 auto;
+        align-items: stretch;
+      }
+
+      .main-button {
+        flex-grow: 1;
+        min-width: 0;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+
+      .dropdown-arrow-button {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-left: 1px solid var(--arrow-button-separator);
+        flex-shrink: 0;
+        flex-grow: 0;
+        min-width: 0;
+        padding-left: 15px;
+        padding-right: 15px;
+        height: 100%;
+      }
+
+      .dropdown-arrow-button::after {
+        content: "";
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid var(--arrow-color);
+        display: inline-block;
+        transition: transform 0.2s ease-in-out;
+      }
+
+      .dropdown-arrow-button.is-open::after {
+        transform: rotate(180deg);
+      }
+
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        top: calc(100% + 5px);
+        right: 0;
+        background-color: var(--dropdown-bg);
+        min-width: 200px; /* You might want to adjust this if button text is much larger */
+        border: 1px solid var(--dropdown-border);
+        z-index: 10;
+        border-radius: 5px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      body.dark-mode .dropdown-content {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      .dropdown-content.show {
+        display: block;
+      }
+
+      .dropdown-content a {
+        color: var(--dropdown-text);
+        padding: 12px 18px;
+        text-decoration: none;
+        display: block;
+        font-size: 16px; /* Font size for dropdown items, can be adjusted if needed */
+        border-bottom: 1px solid var(--dropdown-option-separator);
+      }
+      .dropdown-content a:last-child {
+        border-bottom: none;
+      }
+
+      .dropdown-content a:hover {
+        background-color: var(--dropdown-option-hover-bg);
+      }
+
+      @media (max-width: 768px) {
+        .menu-container {
+          flex-direction: column;
+          align-items: center;
+        }
+        .menu-container > .double-button-container {
+          width: 100%;
+          max-width: 400px;
+          margin-left: 0;
+          margin-right: 0;
+          margin-bottom: 10px;
+        }
+        .menu-container > .double-button-container:not(:last-child) {
+          margin-right: 0;
+        }
+
+        .main-button {
+          border-radius: 5px 0 0 5px;
+        }
+        .dropdown-arrow-button {
+          border-radius: 0 5px 5px 0;
+        }
+        .dropdown-content {
+          left: 0;
+          right: auto;
+          width: 100%;
+          min-width: 0;
+          top: 100%;
+        }
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding: 10px;
+        }
+        h2 {
+          font-size: 1.7em;
+          margin-bottom: 15px;
+        }
+        .menu-container > .double-button-container {
+          margin-bottom: 8px;
+        }
+
+        .menu-button-base {
+          padding: 12px 20px;
+          font-size: 18px; /* MODIFIED: Increased font size for small screens */
+        }
+        .dropdown-arrow-button {
+          padding-left: 12px;
+          padding-right: 12px;
+        }
+        .dropdown-content a {
+          font-size: 15px;
+          padding: 10px 15px;
+        }
+        .theme-switch-wrapper {
+          justify-content: center;
+          padding-right: 0;
+          margin-bottom: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="theme-switch-wrapper">
+      <span class="theme-switch-label" id="theme-label">Modo Claro / Oscuro</span>
+      <button type="button" class="theme-switch-button" role="switch" aria-checked="false" aria-labelledby="theme-label" id="theme-toggle-button"></button>
+    </div>
+
+    <h2>PSFree WebKit Exploit & Lapse Kernel Exploit For PS4 9.00</h2>
+
+    <div class="menu-container">
+      <div class="double-button-container">
+        <a href="https://hemancini.github.io/PSFree/index.html" class="menu-button-base main-button" target="_blank">hemancini</a>
+        <button class="menu-button-base dropdown-arrow-button" id="dropdownToggleBtn1" aria-label="Mostrar opciones hemancini" aria-expanded="false">
+          <span class="visually-hidden">Opciones</span>
+        </button>
+        <div class="dropdown-content" id="myDropdown1">
+          <a href="https://github.com/hemancini/PSFree" target="_blank">Repositorio</a>
+        </div>
+      </div>
+
+      <div class="double-button-container">
+        <a href="https://kmeps4.github.io/PSFree/" class="menu-button-base main-button" target="_blank">Kameleon</a>
+        <button class="menu-button-base dropdown-arrow-button" id="dropdownToggleBtn2" aria-label="Mostrar opciones Kameleon" aria-expanded="false">
+          <span class="visually-hidden">Opciones</span>
+        </button>
+        <div class="dropdown-content" id="myDropdown2">
+          <a href="https://github.com/kmeps4/PSFree" target="_blank">Repositorio</a>
+        </div>
+      </div>
+
+      <div class="double-button-container">
+        <a href="https://ps3120.github.io/psfree/" class="menu-button-base main-button" target="_blank">ps3120</a>
+        <button class="menu-button-base dropdown-arrow-button" id="dropdownToggleBtn3" aria-label="Mostrar opciones ps3120" aria-expanded="false">
+          <span class="visually-hidden">Opciones</span>
+        </button>
+        <div class="dropdown-content" id="myDropdown3">
+          <a href="https://github.com/ps3120/ps3120.github.io" target="_blank">Repositorio</a>
+        </div>
+      </div>
+
+      <div class="double-button-container">
+        <a href="https://mrdude2478.github.io/" class="menu-button-base main-button" target="_blank">MrDude</a>
+        <button class="menu-button-base dropdown-arrow-button" id="dropdownToggleBtn4" aria-label="Mostrar opciones" aria-expanded="false">
+          <span class="visually-hidden">Opciones</span>
+        </button>
+        <div class="dropdown-content" id="myDropdown4">
+          <a href="https://github.com/mrdude2478/mrdude2478.github.io" target="_blank">Repositorio</a>
+        </div>
+      </div>
+    </div>
+
+    <h3>Otros hosts</h3>
+
+    <div class="menu-container">
+      <div class="double-button-container">
+        <a href="https://www.kmeps4.site/" class="menu-button-base main-button" target="_blank">Kameleon</a>
+        <button class="menu-button-base dropdown-arrow-button" id="dropdownToggleBtn9" aria-label="Mostrar opciones" aria-expanded="false">
+          <span class="visually-hidden">Opciones</span>
+        </button>
+        <!-- <div class="dropdown-content" id="myDropdown5">
+          <a href="https://github.com/KAR0218/KAR0218.github.io" target="_blank">Repositorio</a>
+        </div> -->
+      </div>
+      <div class="double-button-container">
+        <a href="https://karo218.ir/" class="menu-button-base main-button" target="_blank">Karo Host</a>
+        <button class="menu-button-base dropdown-arrow-button" id="dropdownToggleBtn5" aria-label="Mostrar opciones" aria-expanded="false">
+          <span class="visually-hidden">Opciones</span>
+        </button>
+        <div class="dropdown-content" id="myDropdown5">
+          <a href="https://kar0218.github.io/" class="menu-button-base main-button" target="_blank">GitHub Page</a>
+          <a href="https://github.com/KAR0218/KAR0218.github.io" target="_blank">Repositorio</a>
+        </div>
+      </div>
+      <div class="double-button-container">
+        <a href="https://cthugha.exploit.menu/" class="menu-button-base main-button" target="_blank">Al Azif</a>
+        <button class="menu-button-base dropdown-arrow-button" id="dropdownToggleBtn6" aria-label="Mostrar opciones" aria-expanded="false">
+          <span class="visually-hidden">Opciones</span>
+        </button>
+        <div class="dropdown-content" id="myDropdown6">
+          <a href="https://github.com/Al-Azif/ps4-exploit-host" target="_blank">Repositorio</a>
+        </div>
+      </div>
+    </div>
+
+    <div id="resultado" style="position: fixed; bottom: 0; text-align: center"></div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        function initializeDropdown(toggleBtnId, contentId) {
+          const toggleBtn = document.getElementById(toggleBtnId);
+          const content = document.getElementById(contentId);
+
+          if (toggleBtn && content) {
+            const options = content.querySelectorAll("a");
+
+            toggleBtn.addEventListener("click", function (event) {
+              event.stopPropagation();
+              document.querySelectorAll(".dropdown-content.show").forEach((openDropdown) => {
+                if (openDropdown.id !== contentId) {
+                  openDropdown.classList.remove("show");
+                  const otherToggleBtnId = openDropdown.id.replace("myDropdown", "dropdownToggleBtn");
+                  const otherToggleBtn = document.getElementById(otherToggleBtnId);
+                  if (otherToggleBtn) {
+                    otherToggleBtn.setAttribute("aria-expanded", "false");
+                    otherToggleBtn.classList.remove("is-open");
+                  }
+                }
+              });
+
+              const isExpanded = toggleBtn.getAttribute("aria-expanded") === "true" || false;
+              content.classList.toggle("show");
+              toggleBtn.setAttribute("aria-expanded", String(!isExpanded));
+              toggleBtn.classList.toggle("is-open", !isExpanded);
+            });
+
+            options.forEach(function (option) {
+              option.addEventListener("click", function (event) {
+                content.classList.remove("show");
+                toggleBtn.setAttribute("aria-expanded", "false");
+                toggleBtn.classList.remove("is-open");
+                // La navegación del enlace <a> ocurrirá naturalmente.
+                // El atributo target="_blank" en el HTML se encargará de abrir en nueva pestaña.
+              });
+            });
+          }
+        }
+
+        // Inicializar todos los dropdowns
+        initializeDropdown("dropdownToggleBtn1", "myDropdown1");
+        initializeDropdown("dropdownToggleBtn2", "myDropdown2");
+        initializeDropdown("dropdownToggleBtn3", "myDropdown3");
+        initializeDropdown("dropdownToggleBtn4", "myDropdown4");
+        initializeDropdown("dropdownToggleBtn5", "myDropdown5");
+        initializeDropdown("dropdownToggleBtn6", "myDropdown6");
+        // Note: dropdownToggleBtn9 does not have a corresponding myDropdown element in the HTML provided.
+        // If it should have one, initializeDropdown("dropdownToggleBtn9", "myDropdown9") would be needed.
+
+        window.addEventListener("click", function (event) {
+          const openDropdowns = document.querySelectorAll(".dropdown-content.show");
+          openDropdowns.forEach((openDropdown) => {
+            const toggleBtnId = openDropdown.id.replace("myDropdown", "dropdownToggleBtn");
+            const toggleBtn = document.getElementById(toggleBtnId);
+            if (toggleBtn && !toggleBtn.contains(event.target) && !openDropdown.contains(event.target)) {
+              openDropdown.classList.remove("show");
+              toggleBtn.setAttribute("aria-expanded", "false");
+              toggleBtn.classList.remove("is-open");
+            }
+          });
+        });
+
+        const themeToggleButton = document.getElementById("theme-toggle-button");
+        if (themeToggleButton) {
+          function applyTheme(theme) {
+            if (theme === "dark") {
+              document.body.classList.add("dark-mode");
+              themeToggleButton.setAttribute("aria-checked", "true");
+            } else {
+              document.body.classList.remove("dark-mode");
+              themeToggleButton.setAttribute("aria-checked", "false");
+            }
+          }
+          themeToggleButton.addEventListener("click", function () {
+            const isCurrentlyDark = themeToggleButton.getAttribute("aria-checked") === "true";
+            if (isCurrentlyDark) {
+              localStorage.setItem("theme", "light");
+              applyTheme("light");
+            } else {
+              localStorage.setItem("theme", "dark");
+              applyTheme("dark");
+            }
+          });
+          // MODIFIED: Default to dark mode if no theme is stored
+          const savedTheme = localStorage.getItem("theme") || "dark";
+          applyTheme(savedTheme);
+        }
+      });
+
+      function isPS4() {
+        const userAgent = navigator.userAgent.toLowerCase();
+        return userAgent.includes("playstation 4") || userAgent.includes("ps4");
+      }
+
+      const resultadoDiv = document.getElementById("resultado");
+
+      if (isPS4()) {
+        resultadoDiv.textContent = `✅ Estás navegando desde una PS4: ${navigator.userAgent}`;
+      } else {
+        resultadoDiv.textContent = "❌ No estás en una PS4. User Agent: " + navigator.userAgent;
+      }
+    </script>
+  </body>
+</html>
