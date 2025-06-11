@@ -9,7 +9,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/common-functions.sh"
 detect_interfaces # Esta función debe definir ETHERNET_IF y WIFI_IF
 
 DOMAIN_BLOCK_ENABLED="true"
-WIFI_5G_ENABLED="false"
+WIFI_5G_ENABLED="true"
 
 WIFI_SSID="${WIFI_SSID_NAT:-"pi-nat"}"
 WIFI_PASS="${WIFI_PASS_NAT:-"12345678"}"
@@ -137,31 +137,34 @@ address=/facebook.com/0.0.0.0
 EOF
 )
 
-DOMAINS_FILE="$(dirname "${BASH_SOURCE[0]}")/dominios/playstation.txt"
-if [ ! -f "$DOMAINS_FILE" ]; then
-    echo "[!] Advertencia: El archivo de entrada '$DOMAINS_FILE' no existe."
-fi
+BASH_DIR="$(dirname "${BASH_SOURCE[0]}")"
+PLAY_DOMAINS="${BASH_DIR}/dominios/playstation.txt"
+NINTENDO_DOMAINS="${BASH_DIR}/dominios/nintendo.txt"
 
-# Si DOMAIN_BLOCK_ENABLED es true, leer dominios desde un archivo de texto
-if [ "$DOMAIN_BLOCK_ENABLED" = "true" ] && [ -f "$DOMAINS_FILE" ] && [ -s "$DOMAINS_FILE" ]; then
-    echo "[x] Leyendo dominios desde $DOMAINS_FILE para bloqueos..."
+ALL_DOMAINS="$PLAY_DOMAINS $NINTENDO_DOMAINS"
+if [ "$DOMAIN_BLOCK_ENABLED" = "true" ]; then
+    DNSMASQ_CONTENT+="\n# Dominios bloqueados desde archivos"
+    for domain_file in $ALL_DOMAINS; do
+        if [ -f "$domain_file" ] && [ -s "$domain_file" ]; then
+            echo "[x] Leyendo dominios desde $domain_file para bloqueos..."
+            while IFS= read -r line || [[ -n "$line" ]]; do
+                # Ignora líneas vacías y comentarios
+                if [[ -z "$line" ]] || [[ "$line" == \#* ]]; then
+                    continue
+                fi
 
-    BLOCK_IP="0.0.0.0" # IP por defecto para los dominios del archivo de texto
-    DNSMASQ_CONTENT+="\n\n# Bloqueos generados desde $DOMAINS_FILE el $(date)"
-    while IFS= read -r line || [[ -n "$line" ]]; do
-        # Ignora líneas vacías y comentarios
-        if [[ -z "$line" ]] || [[ "$line" == \#* ]]; then
-            continue
+                # Elimina espacios en blanco al inicio/final (si los hubiera)
+                domain=$(echo "$line" | xargs)
+
+                # Añade la entrada de bloqueo al contenido
+                if [ -n "$domain" ]; then
+                    DNSMASQ_CONTENT+="\naddress=/$domain/$STATIC_WIFI_IP_PLAIN"
+                fi
+            done <"$domain_file"
+        else
+            echo "[!] Advertencia: El archivo '$domain_file' no existe o está vacío."
         fi
-
-        # Elimina espacios en blanco al inicio/final (si los hubiera)
-        domain=$(echo "$line" | xargs)
-
-        # Añade la entrada de bloqueo al contenido
-        if [ -n "$domain" ]; then
-            DNSMASQ_CONTENT+="\naddress=/$domain/$BLOCK_IP"
-        fi
-    done <"$DOMAINS_FILE"
+    done
 fi
 
 # Reemplazar el archivo /etc/dnsmasq.conf con el nuevo contenido

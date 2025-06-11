@@ -1,4 +1,5 @@
 <?php
+
 // Start output buffering to prevent any unexpected output
 ob_start();
 
@@ -61,7 +62,7 @@ function readConfigVariable($file_path, $variable_name)
     return $matches[2]; // Retorna el valor sin las comillas
   }
 
-  return null; // Variable no encontrada
+  return ""; // Variable no encontrada
 }
 
 // Set custom error handler
@@ -73,12 +74,8 @@ $logDir = '/var/log/bashrunner/';
 // Default starting directory (set to a directory that www-data can access)
 $currentDir = isset($_POST['directory']) ? $_POST['directory'] : '/home/pi';
 
-// Get current time
-$currentTime = date('Y-m-d H:i:s');
-
 // Get current user
 $currentUser = trim(exec('whoami'));
-
 
 $config_file = '/etc/global_var.conf';
 $variable = 'RPI_NETWORK_MODE';
@@ -395,6 +392,9 @@ if (isset($_POST['action'])) {
 
 // For regular page loads, release the buffer
 ob_end_flush();
+
+include 'header.php';
+
 ?>
 
 <!DOCTYPE html>
@@ -407,53 +407,52 @@ ob_end_flush();
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
-  <div class="container">
-    <h1>Raspberry Pi Bash Runner</h1>
-    <div class="user-info">
-      <p>Network Mode: <?php echo htmlspecialchars($networkMode); ?></p>
-      <p>Current User: <?php echo htmlspecialchars($currentUser); ?></p>
-      <p>Current Date: <?php echo htmlspecialchars($currentTime); ?></p>
-    </div>
+<!-- <body> -->
+<div class="container">
+  <h1>Raspberry Pi Bash Runner</h1>
+  <div class="user-info">
+    <p>Network Mode: <?php echo htmlspecialchars($networkMode); ?></p>
+    <p>Current User: <?php echo htmlspecialchars($currentUser); ?></p>
+  </div>
 
-    <div class="command-section">
-      <h2>Execute Bash Command</h2>
-      <textarea id="command" placeholder="Enter your bash command here..."></textarea>
-      <button id="executeBtn">Execute</button>
-    </div>
+  <div class="command-section">
+    <h2>Execute Bash Command</h2>
+    <textarea id="command" placeholder="Enter your bash command here..."></textarea>
+    <button id="executeBtn">Execute</button>
+  </div>
 
-    <div class="file-explorer-section">
-      <h2>File Explorer</h2>
-      <div class="file-explorer-header">
-        <div id="currentPath">/home/pi</div>
-        <button id="refreshDirBtn">Refresh</button>
-      </div>
-      <div class="file-explorer-content" id="fileExplorer">
-        <div class="loading">Loading...</div>
-      </div>
-      <div class="quick-access">
-        <button class="quick-access-btn" data-path="/">Root (/)</button>
-        <button class="quick-access-btn" data-path="/var/www">Web Root</button>
-        <button class="quick-access-btn" data-path="/home">Home</button>
-        <button class="quick-access-btn" data-path="/etc">Config</button>
-        <button class="quick-access-btn" data-path="/var/log">Logs</button>
-      </div>
+  <div class="file-explorer-section">
+    <h2>File Explorer</h2>
+    <div class="file-explorer-header">
+      <div id="currentPath">/home/pi</div>
+      <button id="refreshDirBtn">Refresh</button>
     </div>
-
-    <div class="log-section">
-      <h2>Command Logs</h2>
-      <div class="log-controls">
-        <select id="logSelect">
-          <option value="">Select a log file</option>
-        </select>
-        <button id="refreshLogsBtn">Refresh Logs</button>
-        <button id="autoRefreshBtn">Auto Refresh</button>
-      </div>
-      <pre id="logOutput">No log selected</pre>
+    <div class="file-explorer-content" id="fileExplorer">
+      <div class="loading">Loading...</div>
+    </div>
+    <div class="quick-access">
+      <button class="quick-access-btn" data-path="/">Root (/)</button>
+      <button class="quick-access-btn" data-path="/var/www">Web Root</button>
+      <button class="quick-access-btn" data-path="/home">Home</button>
+      <button class="quick-access-btn" data-path="/etc">Config</button>
+      <button class="quick-access-btn" data-path="/var/log">Logs</button>
     </div>
   </div>
 
-  <script src="scripts.js"></script>
+  <div class="log-section">
+    <h2>Command Logs</h2>
+    <div class="log-controls">
+      <select id="logSelect">
+        <option value="">Select a log file</option>
+      </select>
+      <button id="refreshLogsBtn">Refresh Logs</button>
+      <button id="autoRefreshBtn">Auto Refresh</button>
+    </div>
+    <pre id="logOutput">No log selected</pre>
+  </div>
+</div>
+
+<script src="scripts.js"></script>
 </body>
 
 </html>

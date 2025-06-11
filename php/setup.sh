@@ -43,8 +43,8 @@ mkdir -p /var/www/bashrunner || {
 # Copy application files
 print_message "Copying application files..."
 if [ -f "index.php" ] && [ -f "style.css" ] && [ -f "scripts.js" ]; then
-    cp index.php /var/www/bashrunner/ || {
-        print_error "Failed to copy index.php to destination."
+    cp *.php /var/www/bashrunner/ || {
+        print_error "Failed to copy PHP files to destination."
         exit 1
     }
     cp style.css /var/www/bashrunner/ || {
@@ -184,6 +184,45 @@ print_message "Web server running as user: $WEB_USER"
 # Show current PHP version
 PHP_VERSION=$(php -v | head -n 1)
 print_message "PHP version: $PHP_VERSION"
+
+echo -e "[x] Additional Configuration for DNSMasq"
+cat >/etc/sudoers.d/www-dnsmasq <<EOF
+# Allow www-data to run specific commands without password
+
+www-data ALL=(ALL) NOPASSWD: /bin/cat /etc/dnsmasq.conf
+www-data ALL=(ALL) NOPASSWD: /bin/cp /etc/dnsmasq.conf /tmp/dnsmasq_backup_*.conf
+www-data ALL=(ALL) NOPASSWD: /bin/cp /tmp/dnsmasq.conf.tmp /etc/dnsmasq.conf
+www-data ALL=(ALL) NOPASSWD: /usr/bin/tee -a /etc/dnsmasq.conf
+www-data ALL=(ALL) NOPASSWD: /bin/sed -i * /etc/dnsmasq.conf
+www-data ALL=(ALL) NOPASSWD: /usr/sbin/service dnsmasq restart
+www-data ALL=(ALL) NOPASSWD: /usr/sbin/service dnsmasq status
+www-data ALL=(ALL) NOPASSWD: /usr/sbin/dnsmasq --test
+EOF
+
+# Set permissions for the sudoers file
+chmod 440 /etc/sudoers.d/www-dnsmasq
+
+# Add www-data user to sudoers for hostapd commands
+cat >/etc/sudoers.d/wifi-admin <<EOF
+# Allow www-data to run specific commands without password
+
+www-data ALL=(ALL) NOPASSWD: /usr/bin/tee -a /etc/hostapd/hostapd.conf
+www-data ALL=(ALL) NOPASSWD: /bin/systemctl status hostapd
+www-data ALL=(ALL) NOPASSWD: /bin/systemctl restart hostapd
+www-data ALL=(ALL) NOPASSWD: /usr/sbin/service hostapd restart
+www-data ALL=(ALL) NOPASSWD: /bin/systemctl is-active hostapd
+EOF
+
+# Set proper permissions for the configuration file
+chown root:www-data /etc/hostapd/hostapd.conf
+chmod 664 /etc/hostapd/hostapd.conf
+
+# Create backup directory
+mkdir -p /var/backups/hostapd
+chown www-data:www-data /var/backups/hostapd
+
+echo "Permissions configured successfully!"
+echo "Please run this script with sudo privileges"
 
 # Current date and time
 CURRENT_DATE=$(date '+%Y-%m-%d %H:%M:%S')
